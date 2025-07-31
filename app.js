@@ -1,11 +1,9 @@
 class Entity {
-    constructor(statMedian, statMD) {
-        // statMD = stat maximum deviation
-
+    // statMD means stat maximum deviation
+    constructor(statMedian, statMD, modifier) {
+        // Note: there will be 10 stats in the array
         this.stats = [];
-        // Note: stats array length 10.
-
-        for (let i=1; i<11; i++) {
+        for (let i = 1; i < 11; i++) {
             let value = randRange(statMedian - statMD, statMedian + statMD);
             if (value < 0) {
                 value = 0;
@@ -13,36 +11,40 @@ class Entity {
 
             this.stats.push(value);
         }
+
+        this.statTotal = 0;
+        for (let i = 0; i < 10; i++) {
+            this.statTotal += modifier[i] * this.stats[i]
+        }
+
+        this.rank;
     }
 }
 
 
 // Hardcoded class lol, only used for one purpose and one only: to shuffle colours while making sure all are chosen before a new cycle (like spotify).
-// Daniel would hate me using a class for this but like it's neater.
 class ColourSelector {
-    constructor() {
-        this.colours = [  // Colours subject to change.
-            "#db3535",  // Red
-            "#0683cc",  // Blue
-            "#64d111",  // Green
-            "#ebcc1c",  // Yellow
-        ]
+    static colours = [  // Colours subject to change.
+        "#db3535",  // Red
+        "#0683cc",  // Blue
+        "#64d111",  // Green
+        "#ebcc1c",  // Yellow
+    ];
 
-        this.alreadySelected = []
-    }
+    static availableColours = this.colours.slice();
 
-    choose() {
-        let num = Math.floor(Math.random() * this.colours.length)  // Remember this is exclusive of this.colours.length(), this is fine because value is used to search array.
-        while (this.alreadySelected.includes(num)) {
-            num = Math.floor(Math.random() * this.colours.length)
-        }
-        this.alreadySelected.push(num)
+    static choose() {
+        // Choose random colour from available colours
+        const i = Math.floor(Math.random() * this.availableColours.length);
+        const colour = this.availableColours[i];
+        // Remove selected colour to guarantee every colour gets selected evenly
+        this.availableColours.splice(i, 1);
 
-        if (this.alreadySelected.length == this.colours.length) {
-            this.alreadySelected = []
+        if (this.availableColours.length == 0) {
+            this.availableColours = this.colours.slice();
         }
 
-        return this.colours[num]
+        return colour;
     }
 }
 
@@ -51,172 +53,341 @@ class Timer {
     constructor(seconds) {
         this.timeElapsed = 0;
         this.timerExpired = false;
-        
+
         let count = seconds;
 
         this.timer = setInterval(() => {
             const target = document.getElementById("timer");
-            
-            if (count < 0) {
-                this.timerExpired = true
+
+            if (count <= 0) {
+                this.timerExpired = true;
                 target.innerHTML = `Seconds Overtime: ${-count}`;
             } else {
                 target.innerHTML = `Seconds Left: ${count}`;
             }
             count--;
             this.timeElapsed++;
-
         }, 1000);
     }
 
     stop() {
-        clearInterval(this.timer)
+        clearInterval(this.timer);
     }
 }
 
 
 class GameRound {
-    static randomColour = new ColourSelector();
-    
-    
     constructor(statMedian, statMD) {
         this.statMedian = statMedian;
         this.statMD = statMD;  // stat maximum deviation
         this.roundEnemy;
         this.roundCharacters = [];
 
+        // Helpful tool
+        const statToName = {
+            1: "Strength",
+            2: "Speed",
+            3: "Intelligence",
+            4: "Perserverence",
+            5: "Luck",
+            6: "Rizz",
+            7: "Cuteness",
+            8: "Wealth",
+            9: "Mana",
+            10: "Competence"
+        } 
+
 
         // Determine colour and apply it.
-        this.bgColour = GameRound.randomColour.choose();
-        document.body.style.backgroundColor = this.bgColour
+        this.bgColour = ColourSelector.choose();
+        document.body.style.backgroundColor = this.bgColour;
+
+
+        // Determine modifiers
+        this.modifier = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+        this.modifierCount = randRange(0, 4);
+
+        for (let i = 0; i < this.modifierCount; i++) {
+            const index = randRange(0, 10)
+            const value = randRange(1, 5)  // Modifier can be 1 to 4.
+            this.modifier[index] = value  
+
+            if (value > 1) document.getElementById("rules").innerHTML += `<br>${statToName[index + 1]} has ${value}x value.`
+        }
 
 
         // Create Enemy
-        this.roundEnemy = new Entity(this.statMedian, this.statMD)
-        for (let i=0; i<10; i++) {  // Loop for stats
-            let target = document.getElementById(`enemy-stat${i+1}`);
-            target.innerHTML = `Stat ${i+1}: ${this.roundEnemy.stats[i]}`;
+        this.roundEnemy = new Entity(this.statMedian, this.statMD, this.modifier);
+        for (let i = 0; i < 10; i++) {  // Loop for stats
+            let target = document.getElementById(`enemy-stat${i + 1}`);
+            target.innerHTML = `${statToName[i + 1]}: ${this.roundEnemy.stats[i]}----- I cheat. Total: ${this.roundEnemy.statTotal}`;
         }
 
 
         // Create Characters
-        for (let n=0; n<10; n++) {
-            this.roundCharacters.push(new Entity(this.statMedian, this.statMD))
+        for (let n = 0; n < 10; n++) {
+            this.roundCharacters.push(new Entity(this.statMedian, this.statMD, this.modifier));
 
-            for (let i=0; i<10; i++) {  // Loop for stats
-                let target = document.getElementById(`char${n+1}-stat${i+1}`);
-                target.innerHTML = `Stat ${i+1}: ${this.roundCharacters[n].stats[i]}`;
+            for (let i = 0; i < 10; i++) {  // Loop for stats
+                let target = document.getElementById(`char${n+1}-stat${i + 1}`);
+                target.innerHTML = `${statToName[i + 1]}: ${this.roundCharacters[n].stats[i]}---- I cheat. Total: ${this.roundCharacters[n].statTotal}`;
             }
-        }      
-    }  
+        }
+    }
 }
 
 
 // Game Round stuff
-let totalRounds = 5;  // Very much subject to change
+const totalRounds = 2;  // Very much subject to change
 
-// Minus one because actual time is 1 second longer than specified.
-let intermissionTime = 2;
-let roundTime = 10;
-intermissionTime--;
-roundTime--;
+// Minus one because actual time is 1 second longer than specified due to how setInterval works. Always has interval of minimum 1 seconds.
+const intermissionTime = 1 - 1;
+const roundTime = 60 - 1;
+const pointScale = 10;
+let roundMD = 10
+let roundMedian = 10
+const encryptionKey = 13;
 
 let roundNumber = 1;
 let gameInfo = [];
-let currentRound = new GameRound(10, 10);  // Note to self; stat median and MD will vary as game progresses.
-let timer = new Timer(roundTime)
+let currentRound = new GameRound(roundMD, roundMedian);  // Note to self; stat median and MD will vary as game progresses.
+
+
+let timer = new Timer(roundTime);
+let points = 100;
 
 
 // Actions upon form submit
 const form = document.getElementById("player-options");
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", event => {
     event.preventDefault();  // Don't reload webpage grr
-    if (timer.timerExpired == true) {console.log("time expired");}
+    // if (timer.timerExpired) console.log("time expired");
 
     // Code taken off the internet idk how it works lol
     const data = new FormData(form);
-    let output;
     let choice;
     for (const entry of data) {
-        output = `${entry[0]}=${entry[1]}\r`;
+        // console.log(`for loop entry: ${entry}`)
         choice = entry[1];
     }
 
-    console.log(`Chosen option ${choice}`);
+    // console.log(`Chosen option ${choice}`);
     const radio = document.getElementById(`choice${choice}`);
     radio.checked = false;
 
     
+    // Process quality of player choice
+    // Currently only working on just sum. Add special conditions / multipliers later.
+    const enemy = currentRound.roundEnemy;
+    const playerChoice = currentRound.roundCharacters[choice - 1];
+
+    let winEnemy = [];
+    let loseEnemy = [];
+    for (const entity of currentRound.roundCharacters) {
+        if (entity.statTotal >= enemy.statTotal) {  // >= means they will win even if they are equal with enemy.
+            winEnemy.push(entity);
+        } else {
+            loseEnemy.push(entity);
+        }
+    }
+
+    let choiceCategory;
+    if (winEnemy.includes(playerChoice)) {
+        choiceCategory = winEnemy;
+    } else if (loseEnemy.includes(playerChoice)) {
+        choiceCategory = loseEnemy;
+    } else {
+        // console.log("Point calculation broken.")
+    }
+
+    switch (choiceCategory) {
+        case winEnemy:
+            choiceCategory = "win";
+            break;
+
+        case loseEnemy:
+            choiceCategory = "lose"
+            break;
+    }
+
+    // Adjust points
+    // Point system works like this: total stats are sorted by descending order, the highest total stat is rank 1. 
+    // They gain ponints for higher ranks. If the enemy defeats all, then choose the best option to minimise point loss.
+    choicesList = currentRound.roundCharacters.slice();
+    let criticalRank = 10;
+
+    // Sort
+    for (let i = 0; i < choicesList.length; i++) {
+        for (let n = 0; n < choicesList.length - 1; n++) {
+            if (n < choicesList.length - 1) {
+                let leftValue = choicesList[n];
+                let rightValue = choicesList[n+1];
+
+                if (leftValue.statTotal < rightValue.statTotal) {
+                    choicesList[n] = rightValue
+                    choicesList[n+1] = leftValue
+                }
+            }
+        }
+    }
+
+    for (const n in choicesList) {
+        let character = choicesList[n];
+        character.rank = Number(n) + 1
+
+        if (character.statTotal <= enemy.statTotal) {
+            let newCriticalRank = character.rank;
+            if (newCriticalRank < criticalRank) {
+                criticalRank = newCriticalRank
+            }
+        }
+    }
+    points += (criticalRank - playerChoice.rank) * pointScale
+    document.getElementById('points').innerHTML = `Points: ${points}`
+
+
+    // Process standard deviation of options to assess difficulty.
+    let sample = [];
+    for (const n of choicesList) {
+        sample.push(n.statTotal)
+    }
+    let mean = Math.floor(arraySum(sample) / sample.length * 100) / 100;
+    let sum = 0;
+    for (const n of sample) {
+        sum += (n - mean) ** 2;
+    }
+
+    let sd = Math.floor(Math.sqrt(sum / sample.length) * 100) / 100;
+
+
     // Save round data.
     let roundInfo = {
-        entityStat_Median_SD: [currentRound.statMedian, currentRound.statMD],
+        median_MD: [currentRound.statMedian, currentRound.statMD],
         roundNumber: roundNumber,
         choiceNumber: choice,
-        enemy: currentRound.roundEnemy,
-        character: currentRound.roundCharacters[choice-1],
-        timeExpired: timer.timerExpired,
+        // enemy: enemy,
+        // character: playerChoice,
+        // timeExpired: timer.timerExpired,
         timeElapsed: timer.timeElapsed,
-        backgroundColour: currentRound.bgColour
+        bgColour: currentRound.bgColour,
+        result: choiceCategory,
+        // points: points, 
+        standardDeviation: sd,
+        // allEntities: currentRound.roundCharacters,
+        // modifier: currentRound.modifier,
+        modifierCount: currentRound.modifierCount,
+        rank_critRank: [playerChoice.rank, criticalRank],
     };
     gameInfo.push(roundInfo);
-    
+    // console.log(gameInfo);
+
+
     // End round and proceed.
     if (roundNumber == totalRounds) {
-        timer.stop()
-        document.body.style.backgroundColor = "white"
+        // Game end
+        timer.stop();
+        document.body.style.backgroundColor = "white";
+        document.getElementById("game").hidden = true;
 
-        let targets = ["player-options", "enemy-info"]
-        let target;
+        let string = encryptMessage(JSON.stringify(gameInfo), encryptionKey)
+        
+        let target = document.getElementById("display");
+        target.innerHTML = `<h1>Game concluded.</h1> \n <h1>Code below (it should be copied into your clipboard): <br>${string}</h1> \n <br> \n <h1>Please visit the google form to submit data if this is your first time playing.</h1> 
+        \n <a href="https://forms.gle/aUJEFBtpchr99bHz8" target="_blank">Google Forms</a>`;
 
-        for (const item of targets) {  // "for ... of ..." is used for the value of objects being iterated. "for ... in ..." is used for the keys (index in arrays).
-            target = document.getElementById(item);
-            target.hidden = true
-        }
+        // console.log("game finish");
+        // console.log(gameInfo);
 
-        target = document.getElementById("timer");
-        target.innerHTML = "Game concluded."
+        // Put code in their clipboard
+        navigator.clipboard.writeText(string);
+        // Alert the copied text
+        alert("Code for the game has been copied into your clipboard. Please paste it into the google form. Close this alert to proceed.")
 
-        console.log("game finish")
-        console.log(gameInfo);
+
 
     } else {
         // Round intermission
         count = intermissionTime;
 
-        let targets = ["player-options", "enemy-info", "timer", "user-interface"]
-        let target;
-        for (const item of targets) {  // "for ... of ..." is used for the value of objects being iterated. "for ... in ..." is used for the keys (index in arrays).
-            target = document.getElementById(item);
-            target.hidden = true
-        }
-        document.body.style.backgroundColor = "white"
+        document.getElementById("game").hidden = true;
+        document.body.style.backgroundColor = "white";
+        document.getElementById("display").innerHTML = `<h1>Intermission...</h1>`
 
         intermissionTimer = setInterval(() => {
-            if (count < 0) {
-                clearInterval(intermissionTimer)
+            if (count <= 0) {
+                clearInterval(intermissionTimer);
 
-                for (const item of targets) {  // "for ... of ..." is used for the value of objects being iterated. "for ... in ..." is used for the keys (index in arrays).
-                    target = document.getElementById(item);
-                    target.hidden = false
-                }
+                document.getElementById("game").hidden = false;
+                document.getElementById("display").innerHTML = `<h1>Battle!</h1>`
+                document.getElementById("rules").innerHTML = `Modifiers:`
 
                 // New round. All data from previous round is deleted (except data stored in gameInfo)
                 roundNumber++;
-                currentRound = new GameRound(10, 10);
+                currentRound = new GameRound(roundMedian, roundMD);
 
-                timer.stop()
+                timer.stop();
                 timer = new Timer(roundTime);
             }
             count--;
         }, 1000);
-    };
+    }
 });
 
 
 
 // tools
+function encryptMessage(string, key) {
+    let alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+    let encrypted = '';
 
-function randRange(min, max) {  // Min inclusive, Max exclusive
+    for (const n in string) {
+        const letter = string[n];
+
+        if (alphabet.includes(letter)) {
+            let index = alphabet.findIndex((item) => {
+                return item == letter;
+            });
+
+            encrypted += alphabet[(index + key) % alphabet.length]
+        } else if (letter == ':') {
+            encrypted += '%';
+        } else {
+            encrypted += letter;
+        }
+    }
+
+    return encrypted;
+}
+
+function decryptMessage(string, key) {
+    let alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'x', 'y', 'z', 
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+    let decrypted = '';
+
+    for (const n in string) {
+        const letter = string[n];
+
+        if (alphabet.includes(letter)) {
+            let index = alphabet.findIndex((item) => {
+                return item == letter;
+            });
+
+            decrypted += alphabet[(index + (alphabet.length - key)) % alphabet.length]
+        } else if (letter == '%') {
+            decrypted += ':';
+        } else {
+            decrypted += letter;
+        }
+    }
+
+    return decrypted;
+}
+
+// console.log(encryptMessage('[{"median_MD":[10,10],"roundNumber":1,"choiceNumber":"1","timeElapsed":7,"bgColour":"#ebcc1c","result":"lose","standardDeviation":15.39,"modifierCount":0,"rank_critRank":[9,7]},{"median_MD":[10,10],"roundNumber":2,"choiceNumber":"1","timeElapsed":1,"bgColour":"#0683cc","result":"lose","standardDeviation":14.98,"modifierCount":0,"rank_critRank":[7,3]}]', 10))
+// console.log(decryptMessage('[{"xonsky_MD"%[aj,aj],"3z6ynN6xlo3"%a,"mrzsmoN6xlo3"%"a","5sxoEvk14on"%g,"lqCzvz63"%"#olmmam","3o46v5"%"vz4o","45kynk3nDo7sk5szy"%ae.ci,"xznspso3Cz6y5"%j,"3kyu_m3s5Rkyu"%[i,g]},{"xonsky_MD"%[aj,aj],"3z6ynN6xlo3"%b,"mrzsmoN6xlo3"%"a","5sxoEvk14on"%a,"lqCzvz63"%"#jfhcmm","3o46v5"%"vz4o","45kynk3nDo7sk5szy"%ad.ih,"xznspso3Cz6y5"%j,"3kyu_m3s5Rkyu"%[g,c]}]', 10))
+
+function randRange(min, max) {  // min inclusive, max exclusive
     return Math.floor((Math.random() * (max - min)) + min);
 }
 
@@ -225,3 +396,4 @@ function arraySum(array) {
         return total += current;
     }, 0);
 }
+
