@@ -77,7 +77,7 @@ class Timer {
 
 
 class GameRound {
-    constructor(statMedian, statMD) {
+    constructor(statMedian, statMD, chooseColour) {
         this.statMedian = statMedian;
         this.statMD = statMD;  // stat maximum deviation
         this.roundEnemy;
@@ -92,16 +92,17 @@ class GameRound {
             5: "Luck",
             6: "Rizz",
             7: "Cuteness",
-            8: "Wealth",
+            8: "Moolah",
             9: "Mana",
             10: "Competence"
         } 
 
 
         // Determine colour and apply it.
-        this.bgColour = ColourSelector.choose();
-        document.body.style.backgroundColor = this.bgColour;
-
+        if (chooseColour) {
+            this.bgColour = ColourSelector.choose();
+            document.body.style.backgroundColor = this.bgColour;
+        }
 
         // Determine modifiers
         this.modifier = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
@@ -120,7 +121,7 @@ class GameRound {
         this.roundEnemy = new Entity(this.statMedian, this.statMD, this.modifier);
         for (let i = 0; i < 10; i++) {  // Loop for stats
             let target = document.getElementById(`enemy-stat${i + 1}`);
-            target.innerHTML = `${statToName[i + 1]}: ${this.roundEnemy.stats[i]}----- I cheat. Total: ${this.roundEnemy.statTotal}`;
+            target.innerHTML = `${statToName[i + 1]}: ${this.roundEnemy.stats[i]}`;
         }
 
 
@@ -130,7 +131,7 @@ class GameRound {
 
             for (let i = 0; i < 10; i++) {  // Loop for stats
                 let target = document.getElementById(`char${n+1}-stat${i + 1}`);
-                target.innerHTML = `${statToName[i + 1]}: ${this.roundCharacters[n].stats[i]}---- I cheat. Total: ${this.roundCharacters[n].statTotal}`;
+                target.innerHTML = `${statToName[i + 1]}: ${this.roundCharacters[n].stats[i]}`;
             }
         }
     }
@@ -138,23 +139,25 @@ class GameRound {
 
 
 // Game Round stuff
-const totalRounds = 2;  // Very much subject to change
+const totalRounds = 5;  // Very much subject to change
 
 // Minus one because actual time is 1 second longer than specified due to how setInterval works. Always has interval of minimum 1 seconds.
 const intermissionTime = 1 - 1;
 const roundTime = 60 - 1;
 const pointScale = 10;
-let roundMD = 10
-let roundMedian = 10
+const roundMD = 10
+const roundMedian = 10
+const roundVariation = 5  // The number the round stats may deviate by a maximum of.
 const encryptionKey = 13;
+
 
 let roundNumber = 1;
 let gameInfo = [];
-let currentRound = new GameRound(roundMD, roundMedian);  // Note to self; stat median and MD will vary as game progresses.
-
-
+let currentRound = new GameRound(roundMD, roundMedian, false);
 let timer = new Timer(roundTime);
 let points = 100;
+
+document.getElementById("copy-code").hidden = true
 
 
 // Actions upon form submit
@@ -242,14 +245,18 @@ form.addEventListener("submit", event => {
             }
         }
     }
-    points += (criticalRank - playerChoice.rank) * pointScale
-    document.getElementById('points').innerHTML = `Points: ${points}`
+
+    pointChange = (criticalRank - playerChoice.rank) * pointScale;
+    if (timer.timeElapsed > roundTime + 1) pointChange - 50;
+
+    points += pointChange;
+    document.getElementById('points').innerHTML = `Points: ${points}`;
 
 
     // Process standard deviation of options to assess difficulty.
     let sample = [];
     for (const n of choicesList) {
-        sample.push(n.statTotal)
+        sample.push(n.statTotal);
     }
     let mean = Math.floor(arraySum(sample) / sample.length * 100) / 100;
     let sum = 0;
@@ -270,8 +277,9 @@ form.addEventListener("submit", event => {
         // timeExpired: timer.timerExpired,
         timeElapsed: timer.timeElapsed,
         bgColour: currentRound.bgColour,
-        result: choiceCategory,
-        // points: points, 
+        // result: choiceCategory,
+        // points: points,
+        pointChange: pointChange,
         standardDeviation: sd,
         // allEntities: currentRound.roundCharacters,
         // modifier: currentRound.modifier,
@@ -284,24 +292,22 @@ form.addEventListener("submit", event => {
 
     // End round and proceed.
     if (roundNumber == totalRounds) {
+
         // Game end
         timer.stop();
         document.body.style.backgroundColor = "white";
         document.getElementById("game").hidden = true;
 
-        let string = encryptMessage(JSON.stringify(gameInfo), encryptionKey)
+        let string = encryptMessage(JSON.stringify(gameInfo), encryptionKey);
         
         let target = document.getElementById("display");
-        target.innerHTML = `<h1>Game concluded.</h1> \n <h1>Code below (it should be copied into your clipboard): <br>${string}</h1> \n <br> \n <h1>Please visit the google form to submit data if this is your first time playing.</h1> 
-        \n <a href="https://forms.gle/aUJEFBtpchr99bHz8" target="_blank">Google Forms</a>`;
+        target.innerHTML = `<h1>Game concluded. You have ${points} points.</h1>`;
+
+        document.getElementById("game-code").innerHTML = string;
+        document.getElementById("copy-code").hidden = false;  // Enable users to see element to copy code.
 
         // console.log("game finish");
         // console.log(gameInfo);
-
-        // Put code in their clipboard
-        navigator.clipboard.writeText(string);
-        // Alert the copied text
-        alert("Code for the game has been copied into your clipboard. Please paste it into the google form. Close this alert to proceed.")
 
 
 
@@ -311,22 +317,29 @@ form.addEventListener("submit", event => {
 
         document.getElementById("game").hidden = true;
         document.body.style.backgroundColor = "white";
-        document.getElementById("display").innerHTML = `<h1>Intermission...</h1>`
+        document.getElementById("display").innerHTML = `<h1>Intermission...</h1>`;
 
         intermissionTimer = setInterval(() => {
             if (count <= 0) {
                 clearInterval(intermissionTimer);
 
                 document.getElementById("game").hidden = false;
-                document.getElementById("display").innerHTML = `<h1>Battle!</h1>`
-                document.getElementById("rules").innerHTML = `Modifiers:`
+                document.getElementById("display").innerHTML = `<h1>Battle!</h1>`;
+                document.getElementById("rules").innerHTML = `Modifiers:`;
 
                 // New round. All data from previous round is deleted (except data stored in gameInfo)
                 roundNumber++;
-                currentRound = new GameRound(roundMedian, roundMD);
+                // White rounds for first two and last two, to help judge decision fatigue.
+                if (roundNumber == 1 || roundNumber == 2 || roundNumber == totalRounds - 1 || roundNumber == totalRounds) {  
+                    currentRound = new GameRound(roundMedian, roundMD, false);
+
+                } else {
+                    currentRound = new GameRound(roundMedian + randRange(-roundVariation, roundVariation), roundMD + randRange(-roundVariation, roundVariation), true);
+                }
 
                 timer.stop();
                 timer = new Timer(roundTime);
+                
             }
             count--;
         }, 1000);

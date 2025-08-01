@@ -1,0 +1,27 @@
+label {
+    font-size: 45px;
+    padding-left: 2%;
+}
+
+input[type="radio"] {
+    transform: scale(3);
+}
+
+li {
+    font-size: 20px;
+}
+
+button[name=game-submit] {
+    position: relative;
+    left: 70px;
+    bottom: 20px;
+    transform: scale(2.5);
+    
+}
+
+button[name=code-copy] {
+    position: relative;
+    left: 130px;
+    transform: scale(2.5);
+    
+}
