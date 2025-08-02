@@ -409,4 +409,3 @@ function arraySum(array) {
         return total += current;
     }, 0);
 }
-
