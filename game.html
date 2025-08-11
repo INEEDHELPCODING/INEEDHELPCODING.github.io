@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<head>
+    <title>Game based study</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body>
+    <div id="display">
+    </div>
+
+    <div id="copy-code">
+        <br>
+        <h1>Code below (if button doesn't work, manually copy please):</h1>
+        <br> 
+        <h1 id="game-code"></h1>
+        <br>
+        <br>
+
+        <button name="code-copy" onclick="copyCode()">Click me to copy the code!</button>
+        <script>
+            function copyCode() {
+                navigator.clipboard.writeText(document.getElementById("game-code").innerHTML)
+            }
+        </script>
+
+        <h1>Please visit the google form to submit data if this is your first time playing.</h1> 
+        <a href="https://forms.gle/aUJEFBtpchr99bHz8" target="_blank">Google Forms</a>
+    </div>
+
+    <div id="game">
+        <div id="enemy-info">
+            <h1>Squirble the Slime</h1>
+            <img src="./slime.png">
+            <ul>
+                <li id="enemy-stat1">Stat 1</li>
+                <li id="enemy-stat2">Stat 2</li>
+                <li id="enemy-stat3">Stat 3</li>
+                <li id="enemy-stat4">Stat 4</li>
+                <li id="enemy-stat5">Stat 5</li>
+                <li id="enemy-stat6">Stat 6</li>
+                <li id="enemy-stat7">Stat 7</li>
+                <li id="enemy-stat8">Stat 8</li>
+                <li id="enemy-stat9">Stat 9</li>
+                <li id="enemy-stat10">Stat 10</li>
+            </ul>
+            <br>
+        </div>
+
+        <div id="user-interface">
+            <h1 id="rules">Modifiers:</h1>
+            <br>
+            <h1 id="points">Points: 100</h1>
+            <h1 id="timer">Seconds Left:</h1>
+
+        </div>
+
+        <div>
+            <form id="player-options">
+                <fieldset>
+                    <h1>Options:</h1>
+
+                    <div id="character1">
+                        <input type="radio" id="choice1" name="character-choice" value="1">
+                        <label for="choice1">1: Rick, the Astley of rolls</label><br>
+
+                        <ul>
+                            <li id="char1-stat1">Stat 1</li>
+                            <li id="char1-stat2">Stat 2</li>
+                            <li id="char1-stat3">Stat 3</li>
+                            <li id="char1-stat4">Stat 4</li>
+                            <li id="char1-stat5">Stat 5</li>
+                            <li id="char1-stat6">Stat 6</li>
+                            <li id="char1-stat7">Stat 7</li>
+                            <li id="char1-stat8">Stat 8</li>
+                            <li id="char1-stat9">Stat 9</li>
+                            <li id="char1-stat10">Stat 10</li>
+                        </ul>
+                        <br>
+                        <br>
+                    </div>
+                    
+
+                    <div id="character2">
+                        <input type="radio" id="choice2" name="character-choice" value="2">
+                        <label for="choice2">2: Beetle, Emanator of Preservation</label><br>
+
+                        <ul>
+                            <li id="char2-stat1">Stat 1</li>
+                            <li id="char2-stat2">Stat 2</li>
+                            <li id="char2-stat3">Stat 3</li>
+                            <li id="char2-stat4">Stat 4</li>
+                            <li id="char2-stat5">Stat 5</li>
+                            <li id="char2-stat6">Stat 6</li>
+                            <li id="char2-stat7">Stat 7</li>
+                            <li id="char2-stat8">Stat 8</li>
+                            <li id="char2-stat9">Stat 9</li>
+                            <li id="char2-stat10">Stat 10</li>
+                        </ul>
+                        <br>
+                        <br>
+                    </div>
+
+
+                    <div id="character3">
+                        <input type="radio" id="choice3" name="character-choice" value="3">
+                        <label for="choice3">3: Max, the Cave Diver</label><br>
+
+                        <ul>
+                            <li id="char3-stat1">Stat 1</li>
+                            <li id="char3-stat2">Stat 2</li>
+                            <li id="char3-stat3">Stat 3</li>
+                            <li id="char3-stat4">Stat 4</li>
+                            <li id="char3-stat5">Stat 5</li>
+                            <li id="char3-stat6">Stat 6</li>
+                            <li id="char3-stat7">Stat 7</li>
+                            <li id="char3-stat8">Stat 8</li>
+                            <li id="char3-stat9">Stat 9</li>
+                            <li id="char3-stat10">Stat 10</li>
+                        </ul>
+                        <br>
+                        <br>
+                    </div>
+                    
+
+                    <div id="character4">
+                        <input type="radio" id="choice4" name="character-choice" value="4">
+                        <label for="choice4">4: Pootis, the Heavy Weapons Guy</label><br>
+
+                        <ul>
+                            <li id="char4-stat1">Stat 1</li>
+                            <li id="char4-stat2">Stat 2</li>
+                            <li id="char4-stat3">Stat 3</li>
+                            <li id="char4-stat4">Stat 4</li>
+                            <li id="char4-stat5">Stat 5</li>
+                            <li id="char4-stat6">Stat 6</li>
+                            <li id="char4-stat7">Stat 7</li>
+                            <li id="char4-stat8">Stat 8</li>
+                            <li id="char4-stat9">Stat 9</li>
+                            <li id="char4-stat10">Stat 10</li>
+                        </ul>
+                        <br>
+                        <br>
+                    </div>
+                    
+
+                    <div id="character5">
+                        <input type="radio" id="choice5" name="character-choice" value="5">
+                        <label for="choice5">5: Emu, Destroyer of Worlds</label><br>
+
+                        <ul>
+                            <li id="char5-stat1">Stat 1</li>
+                            <li id="char5-stat2">Stat 2</li>
+                            <li id="char5-stat3">Stat 3</li>
+                            <li id="char5-stat4">Stat 4</li>
+                            <li id="char5-stat5">Stat 5</li>
+                            <li id="char5-stat6">Stat 6</li>
+                            <li id="char5-stat7">Stat 7</li>
+                            <li id="char5-stat8">Stat 8</li>
+                            <li id="char5-stat9">Stat 9</li>
+                            <li id="char5-stat10">Stat 10</li>
+                        </ul>
+                        <br>
+                        <br>
+                    </div>
+                    
+
+                    <div id="character6">
+                        <input type="radio" id="choice6" name="character-choice" value="6">
+                        <label for="choice6">6: Rick, the Door Technician</label><br>
+                        
+                        <ul>
+                            <li id="char6-stat1">Stat 1</li>
+                            <li id="char6-stat2">Stat 2</li>
+                            <li id="char6-stat3">Stat 3</li>
+                            <li id="char6-stat4">Stat 4</li>
+                            <li id="char6-stat5">Stat 5</li>
+                            <li id="char6-stat6">Stat 6</li>
+                            <li id="char6-stat7">Stat 7</li>
+                            <li id="char6-stat8">Stat 8</li>
+                            <li id="char6-stat9">Stat 9</li>
+                            <li id="char6-stat10">Stat 10</li>
+                        </ul>
+                        <br>
+                        <br>
+                    </div>
+
+
+                    <div id="character7">
+                        <input type="radio" id="choice7" name="character-choice" value="7">
+                        <label for="choice7">7: Crocodile, the Bombardier</label><br>
+                        
+                        <ul>
+                            <li id="char7-stat1">Stat 1</li>
+                            <li id="char7-stat2">Stat 2</li>
+                            <li id="char7-stat3">Stat 3</li>
+                            <li id="char7-stat4">Stat 4</li>
+                            <li id="char7-stat5">Stat 5</li>
+                            <li id="char7-stat6">Stat 6</li>
+                            <li id="char7-stat7">Stat 7</li>
+                            <li id="char7-stat8">Stat 8</li>
+                            <li id="char7-stat9">Stat 9</li>
+                            <li id="char7-stat10">Stat 10</li>
+                        </ul>
+                        <br>
+                        <br>
+                    </div>
+
+                    
+                    <div id="character8">
+                        <input type="radio" id="choice8" name="character-choice" value="8">
+                        <label for="choice8">8: Doofenshmirtz, the Inventor</label><br>
+                        
+                        <ul>
+                            <li id="char8-stat1">Stat 1</li>
+                            <li id="char8-stat2">Stat 2</li>
+                            <li id="char8-stat3">Stat 3</li>
+                            <li id="char8-stat4">Stat 4</li>
+                            <li id="char8-stat5">Stat 5</li>
+                            <li id="char8-stat6">Stat 6</li>
+                            <li id="char8-stat7">Stat 7</li>
+                            <li id="char8-stat8">Stat 8</li>
+                            <li id="char8-stat9">Stat 9</li>
+                            <li id="char8-stat10">Stat 10</li>
+                        </ul>
+                        <br>
+                        <br>
+                    </div>
+                    
+
+                    <div id="character9">
+                        <input type="radio" id="choice9" name="character-choice" value="9">
+                        <label for="choice9">9: Mario, the Plumber</label><br>
+                        
+                        <ul>
+                            <li id="char9-stat1">Stat 1</li>
+                            <li id="char9-stat2">Stat 2</li>
+                            <li id="char9-stat3">Stat 3</li>
+                            <li id="char9-stat4">Stat 4</li>
+                            <li id="char9-stat5">Stat 5</li>
+                            <li id="char9-stat6">Stat 6</li>
+                            <li id="char9-stat7">Stat 7</li>
+                            <li id="char9-stat8">Stat 8</li>
+                            <li id="char9-stat9">Stat 9</li>
+                            <li id="char9-stat10">Stat 10</li>
+                        </ul>
+                        <br>
+                        <br>
+                    </div>
+                    
+
+                    <div id="character10">
+                        <input type="radio" id="choice10" name="character-choice" value="10">
+                        <label for="choice10">10: Dave, the Gardener</label><br>
+                        
+                        <ul>
+                            <li id="char10-stat1">Stat 1</li>
+                            <li id="char10-stat2">Stat 2</li>
+                            <li id="char10-stat3">Stat 3</li>
+                            <li id="char10-stat4">Stat 4</li>
+                            <li id="char10-stat5">Stat 5</li>
+                            <li id="char10-stat6">Stat 6</li>
+                            <li id="char10-stat7">Stat 7</li>
+                            <li id="char10-stat8">Stat 8</li>
+                            <li id="char10-stat9">Stat 9</li>
+                            <li id="char10-stat10">Stat 10</li>
+                        </ul>
+                        <br>
+                        <br>
+                    </div>
+
+                    <br>
+                    <br>
+                    <button name="game-submit" type="submit">Submit Answer</button> 
+                </fieldset>
+            </form>
+        </div>
+        
+    </div>
+
+
+    <script src="app.js"></script>
+</body>
