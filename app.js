@@ -139,7 +139,7 @@ class GameRound {
 
 
 // Game Round stuff
-const totalRounds = 5;  // Very much subject to change
+const totalRounds = 10;  // Very much subject to change
 
 // Minus one because actual time is 1 second longer than specified due to how setInterval works. Always has interval of minimum 1 seconds.
 const intermissionTime = 1 - 1;
