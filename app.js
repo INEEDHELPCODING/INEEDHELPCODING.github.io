@@ -25,10 +25,12 @@ class Entity {
 // Hardcoded class lol, only used for one purpose and one only: to shuffle colours while making sure all are chosen before a new cycle (like spotify).
 class ColourSelector {
     static colours = [  // Colours subject to change.
-        "#db3535",  // Red
-        "#0683cc",  // Blue
-        "#64d111",  // Green
-        "#ebcc1c",  // Yellow
+        "#e92828ff",  // Red
+        "#2551e4ff",  // Blue
+        "#24f011ff",  // Green
+        "#ffda08ff",  // Yellow
+        "#f531b4ff",  // Magenta
+        "#09e7f7ff",  // Cyan
     ];
 
     static availableColours = this.colours.slice();
@@ -77,7 +79,7 @@ class Timer {
 
 
 class GameRound {
-    constructor(statMedian, statMD, chooseColour) {
+    constructor(statMD, statMedian , chooseColour) {
         this.statMedian = statMedian;
         this.statMD = statMD;  // stat maximum deviation
         this.roundEnemy;
@@ -106,14 +108,23 @@ class GameRound {
 
         // Determine modifiers
         this.modifier = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
-        this.modifierCount = randRange(0, 4);
+        this.modifierCount = randRange(0, 5);
+
+        let selectedIndex = [];  // Make sure no repeats
 
         for (let i = 0; i < this.modifierCount; i++) {
-            const index = randRange(0, 10)
-            const value = randRange(1, 5)  // Modifier can be 1 to 4.
+            let index = randRange(0, 10);
+            while (selectedIndex.includes(index)) {
+                index = randRange(0, 10);
+            }
+            selectedIndex.push(index);
+
+            // console.log(selectedIndex)
+
+            const value = randRange(1, 5) / 2  // Modifier can be 1 to 2.
             this.modifier[index] = value  
 
-            if (value > 1) document.getElementById("rules").innerHTML += `<br>${statToName[index + 1]} has ${value}x value.`
+            if (value != 1) document.getElementById("rules").innerHTML += `<br>${statToName[index + 1]} has ${value}x value.`
         }
 
 
@@ -142,12 +153,12 @@ class GameRound {
 const totalRounds = 10;  // Very much subject to change
 
 // Minus one because actual time is 1 second longer than specified due to how setInterval works. Always has interval of minimum 1 seconds.
-const intermissionTime = 1 - 1;
+const intermissionTime = 6 - 1;
 const roundTime = 60 - 1;
 const pointScale = 10;
-const roundMD = 10
-const roundMedian = 10
-const roundVariation = 5  // The number the round stats may deviate by a maximum of.
+const roundMD = 10  // Stat maximum deviation from roundMedian
+const roundMedian = 15
+const roundVariation = 5  // The number the roundMedian may deviate by a maximum of.
 const encryptionKey = 13;
 
 
