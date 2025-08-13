@@ -150,10 +150,10 @@ class GameRound {
 
 
 // Game Round stuff
-const totalRounds = 16;  // Very much subject to change
+const totalRounds = 10;  // Very much subject to change
 
 // Minus one because actual time is 1 second longer than specified due to how setInterval works. Always has interval of minimum 1 seconds.
-const intermissionTime = 6 - 1;
+const intermissionTime = 4 - 1;
 const roundTime = 45 - 1;
 const pointScale = 10;
 const roundMD = 10  // Stat maximum deviation from roundMedian
